@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">치즈 인더 트랩</string>
 
+    <string name="quit">중지</string>
+    <string name="really_quit">정말 중지고 싶나요?</string>
+    <string name="yes">네</string>
+    <string name="no">아니요</string>
+
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 </resources>

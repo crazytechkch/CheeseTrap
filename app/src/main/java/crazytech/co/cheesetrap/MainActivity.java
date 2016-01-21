@@ -1,14 +1,19 @@
 package crazytech.co.cheesetrap;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -86,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private WebView webView;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +122,9 @@ public class MainActivity extends AppCompatActivity {
 
     private void initWebView(){
         webView = (WebView)findViewById(R.id.webView);
+        progressBar = (ProgressBar)findViewById(R.id.progressBar);
         webView.setWebViewClient(new MyWebViewClient());
+        webView.setWebChromeClient(new MyMebChromeClient());
         webView.getSettings().setJavaScriptEnabled(true);
         webView.loadUrl("http://comic.naver.com/webtoon/list.nhn?titleId=186811");
     }
@@ -177,7 +185,36 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         if (webView.canGoBack())webView.goBack();
-        else super.onBackPressed();
+        else {
+            showExitDialog();
+        }
+    }
+
+    private AlertDialog showExitDialog() {
+        return new AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.quit)
+                .setMessage(R.string.really_quit)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        //Stop the activity
+                        MainActivity.this.finish();
+                    }
+
+                })
+                .setNegativeButton(R.string.no, null).show();
+    }
+
+    @Override
+    public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        if (keyCode==KeyEvent.KEYCODE_BACK){
+            showExitDialog();
+            return true;
+        }
+        return super.onKeyLongPress(keyCode,event);
     }
 
     private class MyWebViewClient extends WebViewClient{
@@ -185,6 +222,21 @@ public class MainActivity extends AppCompatActivity {
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
             view.loadUrl(url);
             return true;
+        }
+    }
+
+    private class MyMebChromeClient extends WebChromeClient{
+
+        @Override
+        public void onProgressChanged(WebView view, int newProgress) {
+            if(newProgress < 100 && progressBar.getVisibility() == ProgressBar.GONE){
+                progressBar.setVisibility(ProgressBar.VISIBLE);
+            }
+            progressBar.setProgress(newProgress);
+            if(newProgress == 100) {
+                progressBar.setVisibility(ProgressBar.GONE);
+            }
+            //super.onProgressChanged(view, newProgress);
         }
     }
 }
